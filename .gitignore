@@ -1,0 +1,31 @@
+# Compilados de C/C++
+*.exe
+*.out
+*.o
+*.obj
+*.so
+*.dll
+*.lib
+*.a
+*.lo
+*.la
+*.ilk
+*.pdb
+
+# Archivos de depuración
+*.idb
+*.DS_Store
+
+# VS Code
+.vscode/
+
+# Archivos temporales
+Thumbs.db
+Desktop.ini
+
+# Logs
+*.log
+
+# Otros temporales
+*.tmp
+*.temp
