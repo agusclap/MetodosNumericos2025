@@ -10,8 +10,8 @@ int main (void) {
     int opcion;
     do {
         cout << "Menu de opciones:" << endl;
-        cout << "1. Biseccion" << endl;
-        cout << "2. Falsa posicion" << endl;
+        cout << "1. Biseccion [Metodo Cerrado]" << endl;
+        cout << "2. Falsa posicion [Metodo Cerrado]" << endl;
         cout << "3. Salir" << endl;
         cout << "Seleccione una opcion: ";
         cin >> opcion;
