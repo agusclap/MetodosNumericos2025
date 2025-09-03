@@ -3,6 +3,8 @@
 #include <iostream>
 using namespace std;
 
+#define MAXC 101
+
 int main() {
     FILE *fp = fopen("datos.dat","r");
     if (!fp) { puts("No se puede abrir el archivo"); return 1; }
@@ -22,7 +24,7 @@ int main() {
     // Cargar matriz aumentada: m[filas][columnas]
     // Leemos por fila hasta '\n'
     // ¡OJO! aquí usamos un ancho máximo de 100 columnas
-    double m[filas][100];
+    double m[filas][MAXC];
     for (int i = 0; i < filas; ++i) {
         int j = 0;
         do {
@@ -86,7 +88,7 @@ int main() {
     }
 
     // ---------- Retrosustitución ----------
-    double x[100]; // n <= 100 implícitamente por como leemos
+    double x[MAXC]; // n <= 100 implícitamente por como leemos
     for (int i = n - 1; i >= 0; --i) {
         double sum = m[i][n];               // término independiente (columna b)
         for (int j = i + 1; j < n; ++j) {
