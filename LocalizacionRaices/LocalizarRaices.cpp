@@ -51,8 +51,12 @@ int main (void) {
 void biseccion() {
     double a, b, c, c_viejo, fa, fb, fc, error;
     int iter = 0, max_iter = 100;
-    double tol = 1e-6;
-    auto f = [](double x) { return x * x - 9 * x + 2; };
+    double tol = 1e-5;
+    //auto f = [](double x) { return ((9.81 * x)/14) * (1 - pow(exp(1.0), -(14/x) * 7)) ; };
+    auto f = [](double m) {
+        const double g = 9.81, c = 14.0, t = 7.0, v_target = 35.0;
+        return (g*m/c) * (1.0 - std::exp(-(c*t)/m)) - v_target;
+    };
     cout << "Ingrese el intervalo [a, b]: ";
     cin >> a >> b;
 
@@ -94,8 +98,12 @@ void biseccion() {
 void falsaposicion() {
     double a, b, c, c_viejo, fa, fb, fc, error;
     int iter = 0, max_iter = 100;
-    double tol = 1e-6;
-    auto f = [](double x) { return x * x - 9 * x + 2; };
+    double tol = 1e-5;
+    //auto f = [](double x) { return ((9.81 * x)/14) * (1 - pow(exp(1.0), -(14/x) * 7)); };
+    auto f = [](double m) {
+        const double g = 9.81, c = 14.0, t = 7.0, v_target = 35.0;
+        return (g*m/c) * (1.0 - std::exp(-(c*t)/m)) - v_target;
+    };
     cout << "Ingrese el intervalo [a, b]: ";
     cin >> a >> b;
 
@@ -134,7 +142,7 @@ void falsaposicion() {
         }
 
         iter++;
-    } while (fabs(b - a) > tol && iter < max_iter);
+    } while (fabs(b - a) > tol /*&& iter < max_iter */);
 
     cout << "La raiz es: " << c << " y el error es: "<<error<<endl;
 }
