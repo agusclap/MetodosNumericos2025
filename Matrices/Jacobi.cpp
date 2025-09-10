@@ -8,7 +8,7 @@ int MAXC = 100;
 int main (){
 
     // OJO: declaramos n cuando ya sabemos cuántas filas hay
-    double suma = 0, tol = 1e-6, errorviejo = 1000, error;
+    double suma = 0, tol = 1e-11, errorviejo = 1000, error;
     int iter = 0, max_iter = 100;
 
     FILE *fp = fopen("datos.dat","r");
@@ -72,6 +72,7 @@ int main (){
         xv[i] = 0;
     }
 
+    double res = 1e300;
     // Jacobi
     do{
         iter = iter + 1;
@@ -93,7 +94,23 @@ int main (){
         }
         error = sqrt(error);
 
-        if(error > errorviejo){
+        // --- residuo infinito ||A*x - b||_inf con x = xn ---
+        res = 0.0;
+        for (int i = 0; i < n; ++i)
+        {
+            double ax = 0.0;
+            for (int j = 0; j < n; ++j)
+                ax += A[i][j] * xn[j];
+            double ri = fabs(ax - b[i]);
+            if (ri > res)
+                res = ri;
+        }
+
+        // --- criterio de paro por residuo (Problema 3) ---
+        if (res < tol)
+            break;
+
+    if(error > errorviejo){
             cout << "Advertencia: el error aumento (puede no converger)" << endl;
             // si preferís cortar acá, podés hacer 'return 0;'
         }
@@ -103,7 +120,7 @@ int main (){
             xv[i] = xn[i];
         }
 
-    }while(error>tol && iter < max_iter);
+    }while(/*error>tol*/ res>tol && iter < max_iter);
 
     cout << "El metodo " << (error<=tol ? "converge" : "se detuvo por max_iter") 
          << " en " << iter << " iteraciones." << endl;
@@ -112,17 +129,18 @@ int main (){
     for(int x_i = 0; x_i<n; x_i++){
         cout << "x[" << x_i << "] = " << xn[x_i] << endl;
     }
+    cout << "Residuo ||A*x - b||_inf = " << res << endl;
 
 
     // Verificación: residuo ||A*x - b||_inf
-    double res = 0.0;
+    /*double res = 0.0;
     for (int i = 0; i < n; ++i) {
         double ax = 0.0;
         for (int j = 0; j < n; ++j) ax += A[i][j] * xn[j];
             res = max(res, fabs(ax - b[i]));
     }
     cout << "Residuo ||A*x - b||_inf = " << res << endl;
-
+    */
 
     return 0;
 }

@@ -9,6 +9,8 @@ int main() {
     FILE *fp = fopen("datos.dat","r");
     if (!fp) { puts("No se puede abrir el archivo"); return 1; }
 
+    int count = 0;
+
     // Contar filas
     int filas = 0;
     int columnas = 0;
@@ -64,6 +66,7 @@ int main() {
                     m[i][col] = m[p][col];
                     m[p][col] = aux;
                 }
+                count++;
             }
         }
 
@@ -86,6 +89,11 @@ int main() {
         fprintf(stderr, "Sistema singular en última etapa (pivote ~ 0)\n");
         return 1;
     }
+    double det = 1.0;
+    for (int i = 0; i < n; ++i) det *= m[i][i];
+    if (count % 2) det = -det;
+
+    printf("det(A) = %.10f\n", det);
 
     // ---------- Retrosustitución ----------
     double x[MAXC]; // n <= 100 implícitamente por como leemos

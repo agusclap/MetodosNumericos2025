@@ -6,9 +6,9 @@ int MAXC = 100;
 
 int main()
 {
-    //double w = 1.2; // valor w para relajación
+    double w = 1.1; // valor w para relajación
     // OJO: declaramos n cuando ya sabemos cuántas filas hay
-    double suma = 0, tol = 1e-6, errorviejo = 1000, error;
+    double suma = 0, tol = 1e-11, errorviejo = 1000, error;
     int iter = 0, max_iter = 100;
 
     FILE *fp = fopen("datos.dat", "r");
@@ -99,6 +99,13 @@ int main()
         if (fabs(A[i][i]) <= suma)
             cout << "La matriz no es diagonalmente dominante en la fila " << i << endl;
     }
+    int p = 0;
+    const double Z = 1e-14; // umbral de "casi cero"
+    for (int i = 0; i < n; ++i)
+        for (int j = 0; j < n; ++j)
+            if (fabs(A[i][j]) > Z)
+                p = max(p, abs(j - i));
+    cout << "Semi-ancho de banda p = " << p << "\n"; // en este problema: 2
 
     // Inicialización de xv
     for (int i = 0; i < n; i++)
@@ -107,6 +114,8 @@ int main()
     }
 
     // Gauss-Seidel
+    double res = 1e300;
+    
     do
     {
         iter = iter + 1;
@@ -114,9 +123,18 @@ int main()
         for (int i = 0; i < n; i++)
         {
             suma = 0.0; // reset por fila
+            // límites de la banda para la fila i
+            int j0 = max(0, i - p);
+            int j1 = min(n - 1, i + p);
+
+            // usa xn[j] si j<i, xv[j] si j>i, pero SOLO dentro de la banda
+            for (int j = j0; j < i; ++j)
+                suma += A[i][j] * xn[j];
+            for (int j = i + 1; j <= j1; ++j)
+                suma += A[i][j] * xv[j];
 
             // usa xn[j] para j < i (ya actualizado en esta iteración)
-            for (int j = 0; j < i; j++)
+            /*for (int j = 0; j < i; j++)
             {
                 suma = suma + A[i][j] * xn[j];
             }
@@ -124,17 +142,17 @@ int main()
             for (int j = i + 1; j < n; j++)
             {
                 suma = suma + A[i][j] * xv[j];
-            }
+            }*/
 
             if (A[i][i] == 0.0)
             {
                 cout << "Pivote cero en A[" << i << "," << i << "]" << endl;
                 return 0;
             }
-            //double nuevo = (b[i] - suma) / A[i][i]; Relajacion
-            //xn[i] = (1.0 - w) * xv[i] + w * nuevo; Relajacion
+            double nuevo = (b[i] - suma) / A[i][i]; //Relajacion
+            xn[i] = (1.0 - w) * xv[i] + w * nuevo ; //Relajacion
 
-            xn[i] = (b[i] - suma) / A[i][i];
+            //xn[i] = (b[i] - suma) / A[i][i]; // normal
         }
 
         error = 0.0;
@@ -144,6 +162,21 @@ int main()
         }
         error = sqrt(error);
 
+        res = 0.0;
+        for (int i = 0; i < n; ++i)
+        {
+            double ax = 0.0;
+            for (int j = 0; j < n; ++j)
+                ax += A[i][j] * xn[j];
+            double ri = fabs(ax - b[i]);
+            if (ri > res)
+                res = ri;
+        }
+
+        // --- criterio de paro por residuo (Problema 3) ---
+        if (res < tol)
+            break;
+    
         if (error > errorviejo)
         {
             cout << "Advertencia: el error aumento (puede no converger)" << endl;
@@ -156,7 +189,7 @@ int main()
             xv[i] = xn[i];
         }
 
-    } while (error > tol && iter < max_iter);
+    } while (/*error > tol*/res>tol && iter < max_iter);
 
     cout << "El metodo " << (error <= tol ? "converge" : "se detuvo por max_iter")
          << " en " << iter << " iteraciones." << endl;
@@ -166,9 +199,11 @@ int main()
     {
         cout << "x[" << x_i << "] = " << xn[x_i] << endl;
     }
+    cout << "El metodo " << (res <= tol ? "converge" : "se detuvo por max_iter")
+     << " en " << iter << " iteraciones." << endl;
 
     // Verificación: residuo ||A*x - b||_inf
-    double res = 0.0;
+    /*double res = 0.0;
     for (int i = 0; i < n; ++i)
     {
         double ax = 0.0;
@@ -177,7 +212,7 @@ int main()
         double ri = fabs(ax - b[i]);
         if (ri > res)
             res = ri;
-    }
+    }*/
     cout << "Residuo ||A*x - b||_inf = " << res << endl;
 
     return 0;
