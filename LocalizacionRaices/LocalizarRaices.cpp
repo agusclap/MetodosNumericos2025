@@ -1,5 +1,6 @@
 #include <iostream>
 #include <cmath>
+#include <iomanip>
 
 using namespace std;
 
@@ -51,14 +52,21 @@ int main (void) {
 void biseccion() {
     double a, b, c, c_viejo, fa, fb, fc, error;
     int iter = 0, max_iter = 100;
-    double tol = 1e-5;
+    double tol = 1e-9;
     //auto f = [](double x) { return ((9.81 * x)/14) * (1 - pow(exp(1.0), -(14/x) * 7)) ; };
-    auto f = [](double m) {
+    /*auto f = [](double m) {
         const double g = 9.81, c = 14.0, t = 7.0, v_target = 35.0;
         return (g*m/c) * (1.0 - std::exp(-(c*t)/m)) - v_target;
-    };
+    };*/
     cout << "Ingrese el intervalo [a, b]: ";
     cin >> a >> b;
+
+
+    auto f = [&](double C){
+        return C * cosh(12 / C) - C - 5; // raíz en C>0
+    };
+    // elige [CL, CR] con f(CL)>0, f(CR)<0 y corre bisección a tol=1e-9
+
 
     fa = f(a);
     fb = f(b);
@@ -99,11 +107,11 @@ void falsaposicion() {
     double a, b, c, c_viejo, fa, fb, fc, error;
     int iter = 0, max_iter = 100;
     double tol = 1e-5;
-    //auto f = [](double x) { return ((9.81 * x)/14) * (1 - pow(exp(1.0), -(14/x) * 7)); };
-    auto f = [](double m) {
+    auto f = [](double x) { return x*(16-2*x)*(10-2*x) - 100; };
+    /*auto f = [](double m) {
         const double g = 9.81, c = 14.0, t = 7.0, v_target = 35.0;
         return (g*m/c) * (1.0 - std::exp(-(c*t)/m)) - v_target;
-    };
+    };*/
     cout << "Ingrese el intervalo [a, b]: ";
     cin >> a >> b;
 
@@ -151,9 +159,9 @@ void falsaposicion() {
 
 void puntofijo(){
     double x0, x1, error;
-    int iter = 0, max_iter = 100;
-    double tol = 1e-6; 
-    auto g = [] (double x) {return sqrt((x+5)/2);};  
+    int iter = 0, max_iter = 1000;
+    double tol = 1e-13; 
+    auto g = [] (double x) {return 1.0 + cos(x);};  
     cout << "Ingrese el valor inicial x0: ";
     cin >> x0;
 
@@ -169,8 +177,8 @@ void puntofijo(){
         x0 = x1;
         iter++;
     } while (iter < max_iter && error > tol);
-
-    cout << "La raiz es: " << x1 << ", el error es: " << error << " y la cantidad total de iteraciones es: " << iter << endl;
+    cout << fixed << setprecision(13); // error de 12
+    cout << "La raiz es: " << x1 << ", el error es: " << error <<" y la cantidad total de iteraciones es: " << iter << endl;
 }
 
 

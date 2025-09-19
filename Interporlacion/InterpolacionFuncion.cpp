@@ -3,7 +3,11 @@
 #include <cmath>
 using namespace std;
 
-const int n = 3; // número de puntos
+const int n = 6; // número de puntos
+
+double f(double x) {
+    return 4*pow(x,3) - 3*pow(x,2) + 2;
+}
 
 int main (){
     double x[n+1], y[n+1], xs, suma = 0, prod;
@@ -82,6 +86,12 @@ int main (){
         suma += b[i] * pow(xs, i);   // <-- corregido: sin 'suma + suma'
     }
     cout << "El valor interpolado en x = " << xs << " es: " << suma << endl;
+   /* double fx = f(xs);              // valor real de la función
+    double error = fabs(fx - suma); // error absoluto
 
+
+    cout << "P(" << xs << ") = " << suma << endl;
+    cout << "f(" << xs << ") = " << fx << endl;
+    cout << "Error = " << error << endl;*/
     return 0;
 }
