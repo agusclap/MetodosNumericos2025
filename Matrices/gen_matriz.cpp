@@ -33,7 +33,7 @@ int main() {
     for (int i = 0; i < n; ++i) {
         for (int j = 0; j < n; ++j) {
             int val = 0;
-            if (i == j) val = 12;                 // diagonal
+            if (i == j) val = 2;                 // diagonal
             else if (std::abs(i - j) == 1) val = -2; // 1ª sub/super
             else if (std::abs(i - j) == 2) val = 1;  // 2ª sub/super
             fout << val << ' ';

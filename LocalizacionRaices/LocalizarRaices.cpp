@@ -161,12 +161,12 @@ void puntofijo(){
     double x0, x1, error;
     int iter = 0, max_iter = 1000;
     double tol = 1e-13; 
-    auto g = [] (double x) {return 1.0 + cos(x);};  
+    auto g = [] (double x) {return (sin(3*x)- log(x))/2;};  
     cout << "Ingrese el valor inicial x0: ";
     cin >> x0;
 
     do {
-        if(abs((g(x0 + 0.001) - g(x0))/ 0.001) >= 1){
+        if(fabs((g(x0 + 0.001) - g(x0))/ 0.001) >= 1){
             printf("El metodo no converge");
             exit(1);
         }
@@ -182,30 +182,52 @@ void puntofijo(){
 }
 
 
-void newtonRaphson(){
+void newtonRaphson() {
     double x0, x1, error;
     int iter = 0, max_iter = 100;
     double tol = 1e-6;
-    auto f = [](double x) { return x * x - 9 * x + 2; };
-    auto df = [](double x) { return 2 * x - 9; };
-    cout << "Ingrese el valor inicial x0: ";
+    double h = 0.01;                 // del enunciado
+    const double EPS = 1e-12;
+
+    // *** f del problema: 2x + log(x) - sin(3x) (x > 0)
+    auto f = [](double x) { return 2.0*x + log(x) - sin(3.0*x); };
+
+    // *** derivada aproximada: (3f(x) - 4f(x-h) + f(x-2h)) / (2h)
+    auto df = [&](double x) {
+        double hh = h;
+        return (3.0*f(x) - 4.0*f(x - hh) + f(x - 2.0*hh)) / (2.0*hh);
+    };
+
+    cout << "Ingrese el valor inicial x0 (sugerido 0.5): ";
     cin >> x0;
+    if (x0 <= 0.0) { cerr << "x0 debe ser > 0 por log(x).\n"; return; }
 
     do {
-        if(df(x0) < 1e-6) {
-            cerr << "La derivada es pequeña. No se puede continuar." << endl;
+        double dfx = df(x0);
+        if (fabs(dfx) < EPS) {
+            cerr << "La derivada es muy pequeña en x=" << x0 << ". No se puede continuar.\n";
             return;
         }
-        x1 = x0 - f(x0) / df(x0);
+
+        x1 = x0 - f(x0) / dfx;
+
+        // si por el paso quedamos fuera del dominio (x<=0), amortiguamos ligeramente
+        //if (x1 <= 0.0) x1 = 0.5*(x0 + max(1e-3, 0.1*x0));
+
         error = fabs(x1 - x0);
-        cout << "Iteracion " << iter + 1 << ": x0 = " << x0 << ", x1 = " << x1 << endl;
+        cout << "Iteracion " << (iter + 1)
+             << ": x0 = " << x0 << ", x1 = " << x1
+             << ", |dx| = " << error << '\n';
 
         x0 = x1;
         iter++;
     } while (iter < max_iter && error > tol);
 
-    cout << "La raiz es: " << x1 << ", el error es: " << error << " y la cantidad total de iteraciones es: " << iter << endl;
+    cout << "La raiz es: " << x1
+         << ", el error es: " << error
+         << " y la cantidad total de iteraciones es: " << iter << endl;
 }
+
 
 void secante() {
     double x0, x1, x2, error;
