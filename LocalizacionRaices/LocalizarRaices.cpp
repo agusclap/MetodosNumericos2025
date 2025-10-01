@@ -52,8 +52,8 @@ int main (void) {
 void biseccion() {
     double a, b, c, c_viejo, fa, fb, fc, error;
     int iter = 0, max_iter = 100;
-    double tol = 1e-9;
-    //auto f = [](double x) { return ((9.81 * x)/14) * (1 - pow(exp(1.0), -(14/x) * 7)) ; };
+    double tol = 1e-8;
+    auto f = [](double x) { return -26.961*exp(pow(x,2)) + 35.4439 ; };
     /*auto f = [](double m) {
         const double g = 9.81, c = 14.0, t = 7.0, v_target = 35.0;
         return (g*m/c) * (1.0 - std::exp(-(c*t)/m)) - v_target;
@@ -62,9 +62,7 @@ void biseccion() {
     cin >> a >> b;
 
 
-    auto f = [&](double C){
-        return C * cosh(12 / C) - C - 5; // raíz en C>0
-    };
+   
     // elige [CL, CR] con f(CL)>0, f(CR)<0 y corre bisección a tol=1e-9
 
 
@@ -160,13 +158,13 @@ void falsaposicion() {
 void puntofijo(){
     double x0, x1, error;
     int iter = 0, max_iter = 1000;
-    double tol = 1e-13; 
-    auto g = [] (double x) {return (sin(3*x)- log(x))/2;};  
+    double tol = 1e-6; 
+    auto g = [] (double x) {return (sin(3*x)- log10(x))/2;};  
     cout << "Ingrese el valor inicial x0: ";
     cin >> x0;
 
     do {
-        if(fabs((g(x0 + 0.001) - g(x0))/ 0.001) >= 1){
+        if(fabs((g(x0 + 0.01) - g(x0))/ 0.01) >= 1){
             printf("El metodo no converge");
             exit(1);
         }
@@ -177,7 +175,6 @@ void puntofijo(){
         x0 = x1;
         iter++;
     } while (iter < max_iter && error > tol);
-    cout << fixed << setprecision(13); // error de 12
     cout << "La raiz es: " << x1 << ", el error es: " << error <<" y la cantidad total de iteraciones es: " << iter << endl;
 }
 
@@ -190,7 +187,7 @@ void newtonRaphson() {
     const double EPS = 1e-12;
 
     // *** f del problema: 2x + log(x) - sin(3x) (x > 0)
-    auto f = [](double x) { return 2.0*x + log(x) - sin(3.0*x); };
+    auto f = [](double x) { return 2.0*x + log10(x) - sin(3.0*x); };
 
     // *** derivada aproximada: (3f(x) - 4f(x-h) + f(x-2h)) / (2h)
     auto df = [&](double x) {

@@ -3,7 +3,7 @@ using namespace std;
 
 // === Parámetros a setear ===
 const int N = 7;   // cantidad de puntos (filas en datos.dat)
-const int P = 2;   // grado del polinomio a ajustar (0=const, 1=lineal, 2=cuadrático, ...)
+const int P = 1;   // grado del polinomio a ajustar (0=const, 1=lineal, 2=cuadrático, ...)
 
 int main() {
     // ----- Leer datos (x,y) -----

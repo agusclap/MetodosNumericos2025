@@ -3,15 +3,15 @@
 #include <cmath>
 using namespace std;
 
-const int n = 6; // número de puntos
+const int n = 4; // número de puntos
 
 double f(double x) {
     return 4*pow(x,3) - 3*pow(x,2) + 2;
 }
 
 int main (){
-    double x[n+1], y[n+1], xs, suma = 0, prod;
-    double A[n+1][n+1], b[n+1];
+    double x[n], y[n], xs, suma = 0, prod;
+    double A[n][n], b[n];
 
     FILE *fp = fopen("datosFuncion.dat", "r");
     if (!fp) { cerr << "Error al abrir el archivo" << endl; return 1; }
