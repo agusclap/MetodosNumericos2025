@@ -29,3 +29,17 @@ Desktop.ini
 # Otros temporales
 *.tmp
 *.temp
+# Ignorar entorno virtual de Python
+venv/
+.venv/
+
+# Archivos de Python que no importan
+__pycache__/
+*.pyc
+
+# Archivos temporales de VSCode
+.vscode/
+
+# Archivos de Windows
+Thumbs.db
+desktop.ini
