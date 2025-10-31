@@ -103,6 +103,26 @@ void runge_kutta_method() { // RK4 clásico (orden 4)
     guardar("runge_kutta_method.dat", x, y);
 }
 
+void punto_medio_method() {
+    Params p;
+    if (!leer_params(p)) return;
+
+    vector<double> x(p.n + 1), y(p.n + 1);
+    x[0] = p.x0; y[0] = p.y0;
+
+    for (int i = 1; i <= p.n; ++i) {
+        x[i] = p.x0 + i * p.h;
+
+        double k1 = f(x[i-1], y[i-1]);
+        double k2 = f(x[i-1] + p.h / 2.0, y[i-1] + (p.h / 2.0) * k1);
+
+        y[i] = y[i-1] + p.h * k2;
+    }
+
+    guardar("punto_medio_method.dat", x, y);
+}
+
+
 int main() {
     //ios::sync_with_stdio(false);
     //cin.tie(nullptr);
@@ -111,6 +131,7 @@ int main() {
     cout << "1. Metodo de Euler\n";
     cout << "2. Metodo de Heun\n";
     cout << "3. Metodo de Runge-Kutta (RK4)\n";
+    cout << "4. Punto medio" << endl;
     cout << "Ingrese su opcion: ";
     int opcion = 0; cin >> opcion;
 
@@ -118,6 +139,7 @@ int main() {
         case 1: cout << "Ha seleccionado el metodo de Euler.\n"; euler_method(); break;
         case 2: cout << "Ha seleccionado el metodo de Heun.\n"; heun_method(); break;
         case 3: cout << "Ha seleccionado el metodo de Runge-Kutta (RK4).\n"; runge_kutta_method(); break;
+        case 4: cout << "Ha seleccionado el metodo del punto medio.\n"; punto_medio_method(); break;
         default: cerr << "Opcion no valida.\n"; return 1;
     }
     return 0;
