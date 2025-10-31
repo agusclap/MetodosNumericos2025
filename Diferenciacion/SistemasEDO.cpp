@@ -12,15 +12,14 @@ void heun();
 
 void punto_medio();
 
-double f1(double x, double y1, double y2)
-{
-    return x;
+double f1 (double x, double y1, double y2) {
+    return 3*x + y2;
 }
 
-double f2(double x, double y1, double y2)
-{
-    return y1 + y2;
+double f2 (double x, double y1, double y2) {
+    return x*x - y1 - 1;
 }
+
 
 int main(void)
 {
@@ -128,13 +127,13 @@ void euler()
         y2[i + 1] = y2[i] + h * f2(x[i], y1[i], y2[i]); // Si mi sistema tiene mas ecuaciones, seguiria asi
     }
     // Resultados escritos en archivo
-    ofstream archivo("resultadosEuler1.txt");
+    ofstream archivo("resultadosEuler1.dat");
     for (int i = 0; i <= n; i++)
     {
         archivo << x[i] << " " << y1[i] << endl;
     }
     archivo.close();
-    ofstream archivo2("resultadosEuler2.txt");
+    ofstream archivo2("resultadosEuler2.dat");
     for (int i = 0; i <= n; i++)
     {
         archivo2 << x[i] << " " << y2[i] << endl;
@@ -223,14 +222,14 @@ void runge_kutta()
     }
 
     // Resultados escritos en dos archivos
-    ofstream archivo("resultadosRungeKutta1.txt");
+    ofstream archivo("resultadosRungeKutta1.dat");
     for (int i = 0; i <= n; i++)
     {
         archivo << x[i] << " " << y1[i] << endl;
     }
     archivo.close();
 
-    ofstream archivo2("resultadosRungeKutta2.txt");
+    ofstream archivo2("resultadosRungeKutta2.dat");
     for (int i = 0; i <= n; i++)
     {
         archivo2 << x[i] << " " << y2[i] << endl;
@@ -319,14 +318,14 @@ void heun()
         y2[i + 1] = y2[i] + (h / 2.0) * (k12 + k22);
     }
     // Resultados escritos en archivos
-    ofstream archivo("resultadosHeun1.txt");
+    ofstream archivo("resultadosHeun1.dat");
     for (int i = 0; i <= n; i++)
     {
         archivo << x[i] << " " << y1[i] << endl;
     }
     archivo.close();
 
-    ofstream archivo2("resultadosHeun2.txt");
+    ofstream archivo2("resultadosHeun2.dat");
     for (int i = 0; i <= n; i++)
     {
         archivo2 << x[i] << " " << y2[i] << endl;
@@ -411,14 +410,14 @@ void punto_medio()
         y2[i + 1] = y2[i] + h * k2_mid; // Si mi sistema tiene mas ecuaciones, seguiria asi
     }
     // Resultados escritos en archivos
-    ofstream archivo("resultadosPuntoMedio1.txt");
+    ofstream archivo("resultadosPuntoMedio1.dat");
     for (int i = 0; i <= n; i++)
     {
         archivo << x[i] << " " << y1[i] << endl;
     }
     archivo.close();
 
-    ofstream archivo2("resultadosPuntoMedio2.txt");
+    ofstream archivo2("resultadosPuntoMedio2.dat");
     for (int i = 0; i <= n; i++)
     {
         archivo2 << x[i] << " " << y2[i] << endl;
