@@ -1,14 +1,40 @@
 #include <iostream>
 #include <cmath>
 #include <algorithm>
+#include <fstream>
+#include <iomanip>
 using namespace std;
 
-int N = 6;
+int N = 9; // numero de puntos de datos
+
+double eval_spline(double xs, const double x[], const double sol[], int N){
+    // localizar tramo k tal que x[k] <= xs <= x[k+1]
+    int k = -1;
+    for (int i = 0; i < N-1; ++i){
+        if (xs >= x[i] && xs <= x[i+1]) { k = i; break; }
+    }
+    if (k == -1) k = (xs < x[0]) ? 0 : (N-2); // extrapola si queda afuera
+
+    int c = 4*k;                 // base de columnas para el tramo k
+    double a = sol[c+0];
+    double b = sol[c+1];
+    double c1 = sol[c+2];
+    double d = sol[c+3];
+
+    return a*pow(xs,3) + b*pow(xs,2) + c1*xs + d;
+}
 
 int main(void)
 {
     int count = 0;
-    double x[N], y[N], A[4 * N][4 * N] = {0}, b[4 * N] = {0};
+    double x[N] = {0}, y[N] = {0}, A[4 * N][4 * N] = {0}, b[4 * N] = {0};
+
+    for (int i = 0; i < 4*N; i++)
+    for (int j = 0; j < 4*N; j++)
+        A[i][j] = 0.0;
+
+
+
     const double EPS = 1e-12;   // singularidad
     const double THRESH = 1e-2; // umbral de pivoteo “profe”
     FILE *fp = fopen("datos.dat", "r");
@@ -72,9 +98,9 @@ int main(void)
         A[r][cL + 0] = 3 * xc * xc;
         A[r][cL + 1] = 2 * xc;
         A[r][cL + 2] = 1.0;
-        A[r][cR + 0] -= 3 * xc * xc;
-        A[r][cR + 1] -= 2 * xc;
-        A[r][cR + 2] -= 1.0;
+        A[r][cR + 0] = -3 * xc * xc;
+        A[r][cR + 1] = -2 * xc;
+        A[r][cR + 2] = -1.0;
         b[r] = 0.0;
         r++;
     }
@@ -89,8 +115,8 @@ int main(void)
         // S''_{k-1}(xc) - S''_k(xc) = 0
         A[r][cL + 0] = 6 * xc;
         A[r][cL + 1] = 2.0;
-        A[r][cR + 0] -= 6 * xc;
-        A[r][cR + 1] -= 2.0;
+        A[r][cR + 0] = -6 * xc;
+        A[r][cR + 1] = -2.0;
         b[r] = 0.0;
         r++;
     }
@@ -169,6 +195,8 @@ int main(void)
         sol[i] = acc / A[i][i];
     }
 
+   
+
     // Mostrar solución (coeficientes por tramo)
     for (int i = 0; i < M; ++i)
         printf("coef[%d] = %.10f\n", i, sol[i]);
@@ -198,6 +226,20 @@ int main(void)
         double ys = a * pow(xs, 3) + b2 * pow(xs, 2) + c2 * xs + d2;
         cout << "S(" << xs << ") = " << ys << "\n";
     }
+    const int NU = 10;                 // 10 subintervalos -> 11 puntos
+    const double aU = 1.0, bU = 2.0;   // intervalo pedido por el enunciado
+    const double hU = (bU - aU) / NU;  // 0.1
 
+    ofstream out("tabla_uniforme.dat");
+    out.setf(std::ios::fixed);
+    out << setprecision(6);
+
+    for (int i = 0; i <= NU; ++i) {
+        double xi = aU + i*hU;
+        double fi = eval_spline(xi, x, sol, N);   // <<< TU SPLINE
+        out << xi << " " << fi << "\n";
+    }
+    out.close();
+    cout << "OK: escribi tabla_uniforme.dat (h=0.1, 11 filas)\n";
     return 0;
 }
