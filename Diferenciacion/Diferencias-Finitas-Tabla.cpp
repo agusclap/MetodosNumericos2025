@@ -10,9 +10,9 @@ int main() {
     cin.tie(nullptr);
 
     // leer los datos del spline
-    ifstream in("tabla_uniforme.dat");
+    ifstream in("tabla_fx.dat");
     if (!in) {
-        cerr << "No se pudo abrir tabla_uniforme.dat\n";
+        cerr << "No se pudo abrir tabla_fx.dat\n";
         return 1;
     }
 

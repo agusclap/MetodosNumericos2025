@@ -3,10 +3,11 @@
 #include <fstream>
 #include <iomanip>
 #include <stdexcept>
+#include <cmath>
 using namespace std;
 
 double f(double x) {
-    return x*x; // ejemplo
+    return exp(sqrt(1+x)) * log(1+2*x*x); // ejemplo
 }
 
 int main() {

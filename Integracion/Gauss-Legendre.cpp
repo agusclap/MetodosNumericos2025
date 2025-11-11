@@ -1,8 +1,9 @@
 #include <iostream>
+#include <cmath>
 using namespace std;
 
 double f (double x) {
-    return x*x;
+    return exp(sqrt(1.0 + x)) * ((log(1.0 + 2.0*x*x))/(2*sqrt(1+x)) + (4*x)/(1+2*x*x)); // ejemplo
 }
 
 int main (void) {
