@@ -9,7 +9,7 @@ using namespace std;
 
 // ---------------------------------------------------------
 // Función a integrar (podés cambiarla)
-double f(double x) { return x * x; }
+double f(double x) { return 3*pow(x,2) + 1; }
 // ---------------------------------------------------------
 
 // ---------------------------------------------------------
@@ -129,7 +129,36 @@ struct SplineCubico {
 // ---------------------------------------------------------
 // INTEGRACIÓN
 // ---------------------------------------------------------
-
+// Esta es la nueva función que implementa la fórmula de dos sumatorias
+double trapecio_modificado_func(double a, double b, int n) {
+    // 1. Calcular el paso h (asumimos subintervalos uniformes, como en el problema)
+    double h = (b - a) / n;
+    
+    double SumaTotal = 0.0;
+    
+    // 2. Bucle desde i=0 hasta n-1
+    for (int i = 0; i < n; ++i) {
+        // Nodos del intervalo [x_i, x_{i+1}]
+        double xi = a + i * h;
+        double xi_plus_1 = a + (i + 1) * h;
+        
+        // Valores de la función
+        double f_i = f(xi);
+        double f_i_plus_1 = f(xi_plus_1);
+        
+        // Contribución de la Suma 1: (x_{i+1} - x_i) * f(x_i) = h * f(x_i)
+        double C1 = h * f_i;
+        
+        // Contribución de la Suma 2: 0.5 * (x_{i+1} - x_i) * (f(x_{i+1}) - f(x_i))
+        // C2 = 0.5 * h * (f(x_{i+1}) - f(x_i))
+        double C2 = 0.5 * h * (f_i_plus_1 - f_i);
+        
+        // Acumular
+        SumaTotal += C1 + C2;
+    }
+    
+    return SumaTotal;
+}
 // Trapecio (función), n subintervalos
 double trapecio_func(double a, double b, int n) {
     if (n < 1) throw runtime_error("n >= 1");

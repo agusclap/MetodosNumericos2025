@@ -1,20 +1,97 @@
 #include <iostream>
+#include <vector>
+#include <fstream>
+#include <iomanip>
 #include <cmath>
+#include <string>
 using namespace std;
 
+// --------- FUNCION ANALITICA ORIGINAL ----------
+// EDO: y' = f(x,y)  (acá solo integrás f(x), no y')
 double f (double x) {
     return exp(sqrt(1.0 + x)) * ((log(1.0 + 2.0*x*x))/(2*sqrt(1+x)) + (4*x)/(1+2*x*x)); // ejemplo
+}
+
+// --------- SOPORTE PARA TABLA ----------
+vector<double> Xtab, Ytab;
+bool usar_tabla = false;
+
+// Lee archivo de tabla: cada línea "x  f(x)"
+bool leer_tabla(const string& filename) {
+    ifstream in(filename);
+    if (!in) {
+        cerr << "No se pudo abrir el archivo de tabla: " << filename << endl;
+        return false;
+    }
+    double xt, yt;
+    Xtab.clear();
+    Ytab.clear();
+    while (in >> xt >> yt) {
+        Xtab.push_back(xt);
+        Ytab.push_back(yt);
+    }
+    if (Xtab.size() < 2) {
+        cerr << "La tabla debe tener al menos 2 puntos.\n";
+        return false;
+    }
+    return true;
+}
+
+// Interpolación lineal sobre la tabla
+double f_tabla(double x) {
+    int n = (int)Xtab.size();
+
+    // Fuera de rango: clamp (usar extremo más cercano)
+    if (x <= Xtab[0]) return Ytab[0];
+    if (x >= Xtab[n-1]) return Ytab[n-1];
+
+    // Buscar intervalo [Xi, Xi+1] que contiene a x
+    for (int i = 0; i < n - 1; ++i) {
+        if (x >= Xtab[i] && x <= Xtab[i+1]) {
+            double t = (x - Xtab[i]) / (Xtab[i+1] - Xtab[i]);
+            return Ytab[i]*(1.0 - t) + Ytab[i+1]*t;
+        }
+    }
+    // No debería llegar acá si la tabla está ordenada
+    return 0.0;
+}
+
+// Evaluador genérico: usa f() o f_tabla() según la bandera
+double eval_f(double x) {
+    if (usar_tabla) return f_tabla(x);
+    else            return f(x);
 }
 
 int main (void) {
     double a, b, I = 0.0;
     int n;
+
     cout << "Ingresar los limites de integracion (a,b): ";
     cin >> a >> b;
-    
-    // Calculo de I
-    cout<<"Ingresar el numero de puntos (n): ";
-    cin>>n; 
+
+    // Elegir modo de evaluacion
+    cout << "Seleccione modo de integracion:\n";
+    cout << "1) Funcion analitica f(x)\n";
+    cout << "2) Leer f(x) desde tabla (archivo)\n";
+    int modo;
+    cin >> modo;
+
+    if (modo == 2) {
+        usar_tabla = true;
+        string nombre;
+        cout << "Ingrese el nombre del archivo de tabla (x f(x)): ";
+        cin >> nombre;
+        if (!leer_tabla(nombre)) {
+            return 1; // error leyendo tabla
+        }
+    } else {
+        usar_tabla = false;
+    }
+
+    // Calculo de I por Gauss-Legendre
+    cout << "Ingresar el numero de puntos (n): ";
+    cin >> n;
+
     switch(n) {
         case 2:
         {
@@ -22,7 +99,11 @@ int main (void) {
             double c1 = 1.0;
             double x0 = -0.5773502691896257;
             double x1 = -x0;
-            I = (b-a)/2 * (c0*f(((b-a)*x0 + (b+a))/2) + c1*f(((b-a)*x1 + (b+a))/2));
+
+            double x0m = ((b-a)*x0 + (b+a))/2.0;
+            double x1m = ((b-a)*x1 + (b+a))/2.0;
+
+            I = (b-a)/2 * (c0*eval_f(x0m) + c1*eval_f(x1m));
             break;
         }
         case 3:
@@ -33,7 +114,12 @@ int main (void) {
             double x0 = -0.7745966692414834;
             double x1 = 0.0;
             double x2 = -x0;
-            I = (b-a)/2 * (c0*f(((b-a)*x0 + (b+a))/2) + c1*f(((b-a)*x1 + (b+a))/2) + c2*f(((b-a)*x2 + (b+a))/2));
+
+            double x0m = ((b-a)*x0 + (b+a))/2.0;
+            double x1m = ((b-a)*x1 + (b+a))/2.0;
+            double x2m = ((b-a)*x2 + (b+a))/2.0;
+
+            I = (b-a)/2 * (c0*eval_f(x0m) + c1*eval_f(x1m) + c2*eval_f(x2m));
             break;
         }
         case 4:
@@ -46,7 +132,14 @@ int main (void) {
             double x1 = -0.3399810435848563;
             double x2 = -x1;
             double x3 = -x0;
-            I = (b-a)/2 * (c0*f(((b-a)*x0 + (b+a))/2) + c1*f(((b-a)*x1 + (b+a))/2) + c2*f(((b-a)*x2 + (b+a))/2) + c3*f(((b-a)*x3 + (b+a))/2));
+
+            double x0m = ((b-a)*x0 + (b+a))/2.0;
+            double x1m = ((b-a)*x1 + (b+a))/2.0;
+            double x2m = ((b-a)*x2 + (b+a))/2.0;
+            double x3m = ((b-a)*x3 + (b+a))/2.0;
+
+            I = (b-a)/2 * (c0*eval_f(x0m) + c1*eval_f(x1m)
+                         + c2*eval_f(x2m) + c3*eval_f(x3m));
             break;
         }
         case 5:
@@ -61,7 +154,16 @@ int main (void) {
             double x2 = 0.0;
             double x3 = -x1;
             double x4 = -x0;
-            I = (b-a)/2 * (c0*f(((b-a)*x0 + (b+a))/2) + c1*f(((b-a)*x1 + (b+a))/2) + c2*f(((b-a)*x2 + (b+a))/2) + c3*f(((b-a)*x3 + (b+a))/2) + c4*f(((b-a)*x4 + (b+a))/2));
+
+            double x0m = ((b-a)*x0 + (b+a))/2.0;
+            double x1m = ((b-a)*x1 + (b+a))/2.0;
+            double x2m = ((b-a)*x2 + (b+a))/2.0;
+            double x3m = ((b-a)*x3 + (b+a))/2.0;
+            double x4m = ((b-a)*x4 + (b+a))/2.0;
+
+            I = (b-a)/2 * (c0*eval_f(x0m) + c1*eval_f(x1m)
+                         + c2*eval_f(x2m) + c3*eval_f(x3m)
+                         + c4*eval_f(x4m));
             break;
         }
         case 6:
@@ -78,13 +180,24 @@ int main (void) {
             double x3 = -x2;
             double x4 = -x1;
             double x5 = -x0;
-            I = (b-a)/2 * (c0*f(((b-a)*x0 + (b+a))/2) + c1*f(((b-a)*x1 + (b+a))/2) + c2*f(((b-a)*x2 + (b+a))/2) + c3*f(((b-a)*x3 + (b+a))/2) + c4*f(((b-a)*x4 + (b+a))/2) + c5*f(((b-a)*x5 + (b+a))/2));
+
+            double x0m = ((b-a)*x0 + (b+a))/2.0;
+            double x1m = ((b-a)*x1 + (b+a))/2.0;
+            double x2m = ((b-a)*x2 + (b+a))/2.0;
+            double x3m = ((b-a)*x3 + (b+a))/2.0;
+            double x4m = ((b-a)*x4 + (b+a))/2.0;
+            double x5m = ((b-a)*x5 + (b+a))/2.0;
+
+            I = (b-a)/2 * (c0*eval_f(x0m) + c1*eval_f(x1m)
+                         + c2*eval_f(x2m) + c3*eval_f(x3m)
+                         + c4*eval_f(x4m) + c5*eval_f(x5m));
             break;
         }
         default:
             cout << "n debe estar entre 2 y 6" << endl;
             return 0;
     }
+
     cout << "El valor de la integral es: " << I << endl;
     return 0;
 }
